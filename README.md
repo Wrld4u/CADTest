@@ -9,6 +9,7 @@
 - Успех: `201`
 - Конфликт занятого места: `409` и сообщение `К сожалению место уже забронировано`
 - Бронь постоянная, без отмены
+- Вставка в БД: `INSERT ... ON CONFLICT DO NOTHING RETURNING` (без exception-path для конфликтов)
 
 ## Стек
 
@@ -29,6 +30,9 @@ npm install
 2. Создать `.env` на основе `.env.example`.
 
    Если `REDIS_URL` не задан, сервис работает только через Postgres.
+   Для тюнинга можно менять `DATABASE_URL` (`connection_limit`, `pool_timeout`) и
+   `RESERVE_MAX_IN_FLIGHT` (backpressure лимит одновременных операций reserve).
+   Текущие дефолты после A/B: `connection_limit=40`, `RESERVE_MAX_IN_FLIGHT=96`.
 
 3. Поднять Postgres (любой локальный способ) и применить миграции:
 
@@ -50,6 +54,9 @@ docker compose up --build
 ```
 
 Важно: тома для Postgres не используются, данные живут только пока контейнеры активны.
+
+Профиль Postgres в `docker-compose.yml` уже содержит базовый тюнинг для нагрузочного локального прогона
+(`max_connections`, `shared_buffers`, `work_mem`, `synchronous_commit=off` и др.).
 
 ## Команды
 

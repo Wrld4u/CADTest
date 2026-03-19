@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Reservation {
-    id        String   @id @default(cuid())
+    id        String   @id @default(uuid()) @db.Uuid
     userId    String   @map("user_id")
     seatId    String   @unique @map("seat_id")
     createdAt DateTime @default(now()) @map("created_at")
