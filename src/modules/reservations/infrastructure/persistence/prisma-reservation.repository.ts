@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { RedisService } from '../../../../infrastructure/redis/redis.service'
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service'
 import { Prisma } from '../../../../generated/prisma/client'
 import { Reservation } from '../../domain/entities/reservation.entity'
@@ -7,9 +8,17 @@ import { ReservationRepository } from '../../domain/repositories/reservation.rep
 
 @Injectable()
 export class PrismaReservationRepository implements ReservationRepository {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly redisService: RedisService
+    ) {}
 
     async reserve(params: { userId: string; seatId: string }): Promise<Reservation> {
+        const lockAcquired = await this.redisService.tryAcquireSeatLock(params.seatId)
+        if (lockAcquired === false) {
+            throw new SeatAlreadyReservedError()
+        }
+
         try {
             const createdReservation = await this.prisma.reservation.create({
                 data: {
@@ -17,6 +26,10 @@ export class PrismaReservationRepository implements ReservationRepository {
                     seatId: params.seatId
                 }
             })
+
+            if (lockAcquired === true) {
+                await this.redisService.persistSeatLock(params.seatId)
+            }
 
             return new Reservation(
                 createdReservation.id,
@@ -29,7 +42,15 @@ export class PrismaReservationRepository implements ReservationRepository {
                 error instanceof Prisma.PrismaClientKnownRequestError &&
                 error.code === 'P2002'
             ) {
+                if (lockAcquired === true) {
+                    await this.redisService.persistSeatLock(params.seatId)
+                }
+
                 throw new SeatAlreadyReservedError()
+            }
+
+            if (lockAcquired === true) {
+                await this.redisService.releaseSeatLock(params.seatId)
             }
 
             throw error

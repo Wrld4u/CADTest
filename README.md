@@ -15,6 +15,7 @@
 - `NestJS`
 - `PostgreSQL`
 - `Prisma`
+- `Redis` (опциональный pre-check для ускорения conflict-path)
 - `Jest` (`unit + e2e`)
 
 ## Локальный запуск без Docker
@@ -26,6 +27,8 @@ npm install
 ```
 
 2. Создать `.env` на основе `.env.example`.
+
+   Если `REDIS_URL` не задан, сервис работает только через Postgres.
 
 3. Поднять Postgres (любой локальный способ) и применить миграции:
 
@@ -61,3 +64,7 @@ docker compose up --build
 - `make load-test` — нагрузочный hotspot-тест (все запросы в один `seat_id`)
 - `make load-test-unique` — нагрузочный тест с уникальными `user_id/seat_id` через `autocannon`
 - `make load-test-mixed` — смешанный профиль: 80% unique + 20% hotspot одновременно
+
+Результаты нагрузочных прогонов:
+- без Redis: `docs/noRedis.md`
+- с Redis pre-check: `docs/withRedis.md`

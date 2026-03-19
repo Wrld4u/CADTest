@@ -11,6 +11,14 @@ services:
             timeout: 5s
             retries: 10
 
+    redis:
+        image: redis:7-alpine
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+
     app:
         build:
             context: .
@@ -18,8 +26,11 @@ services:
         depends_on:
             db:
                 condition: service_healthy
+            redis:
+                condition: service_healthy
         environment:
             PORT: 3000
             DATABASE_URL: postgresql://postgres:postgres@db:5432/reservations?schema=public
+            REDIS_URL: redis://redis:6379
         ports:
             - '3000:3000'
