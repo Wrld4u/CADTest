@@ -341,3 +341,22 @@ Req/Bytes counts sampled once per second.
 3k requests in 20.09s, 1.2 MB read
 29 errors (29 timeouts)
 ```
+
+## Long race validation (30s)
+
+Профиль:
+- `POST /reserve`
+- `120` connections
+- `30s`
+- все запросы в один `seat_id` (`race-hot-seat-long`)
+
+Результат:
+- `1 2xx responses, 21061 non 2xx responses`
+- `21k requests in 30.07s`
+- `Req/Sec Avg: 702.07`
+- `Latency Avg: 170.01 ms`
+- `p99 latency: 243 ms`
+
+Вывод:
+- Инвариант корректности соблюдён: успешно забронировать место удалось ровно один раз.
+- Повторно занять уже занятое место при длительной конкурентной нагрузке не удалось.
