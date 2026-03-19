@@ -71,7 +71,11 @@ docker compose up --build
 - `make load-test` — нагрузочный hotspot-тест (все запросы в один `seat_id`)
 - `make load-test-unique` — нагрузочный тест с уникальными `user_id/seat_id` через `autocannon`
 - `make load-test-mixed` — смешанный профиль: 80% unique + 20% hotspot одновременно
+- `make load-test-50k-hotspot` — hotspot-сценарий на 50k запросов (`autocannon`)
 
 Результаты нагрузочных прогонов:
 - без Redis: `docs/noRedis.md`
 - с Redis pre-check: `docs/withRedis.md`
+
+Итоговая валидация требований тестового задания:
+- `docs/target-validation.md`

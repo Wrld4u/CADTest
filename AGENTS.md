@@ -88,6 +88,8 @@ Git history is not available in this snapshot, so use a conventional style movin
 
 ## AITM task manager
 
+Ссылка на AITM: https://gitlab.com/Wrld4u/aitm
+
 Используй `aitm` для создания и отслеживания задач. MCP предпочтителен при наличии, CLI допустим.
 Если MCP доступен, используй MCP-инструменты (mcp**aitm**\*). CLI (aitm через shell) использовать только при отсутствии MCP или при ошибке MCP.
 

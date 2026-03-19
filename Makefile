@@ -34,3 +34,6 @@ load-test-mixed:
 	(sh -c "npx autocannon -m POST -d 20 -c 160 -I -H 'content-type: application/json' -b '{\"user_id\":\"user-[<id>]\",\"seat_id\":\"seat-[<id>]\"}' http://localhost:3000/reserve") & \
 	(sh -c "npx autocannon -m POST -d 20 -c 40 -H 'content-type: application/json' -b '{\"user_id\":\"mixed-hot\",\"seat_id\":\"mixed-hot-seat\"}' http://localhost:3000/reserve") & \
 	wait
+
+load-test-50k-hotspot:
+	npx autocannon -m POST -a 50000 -c 500 -t 20 -H 'content-type: application/json' -b '{"user_id":"load-50k","seat_id":"seat-50k-hot"}' http://localhost:3000/reserve
