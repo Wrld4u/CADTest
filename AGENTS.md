@@ -59,6 +59,33 @@ Git history is not available in this snapshot, so use a conventional style movin
 - Never commit secrets, credentials, or proprietary CAD samples without approval.
 - Store local settings in ignored files (for example, `.env.local`) and provide `.env.example` templates.
 
+## Stack & Architecture (Current Project)
+
+- Текущий стек: `NestJS + TypeScript`.
+- Архитектурный стиль: `DDD + Hexagonal`.
+- Основная БД: `PostgreSQL` через `Prisma`.
+- `Redis` допускается как опциональный инфраструктурный компонент при необходимости оптимизаций.
+
+### Functional Scope (Test Assignment)
+
+- Реализуется только один endpoint: `POST /reserve`.
+- Принимает: `user_id`, `seat_id`.
+- Бронь вечная: нет отмены, нет TTL.
+- При повторной попытке бронирования занятого места возвращать `409` и текст:
+  `К сожалению место уже забронировано`.
+
+### Concurrency & Consistency Rules
+
+- Гарантия «одно место — один пользователь» обеспечивается на уровне БД.
+- Обязательно использовать уникальное ограничение на `seat_id` (или эквивалент).
+- Обработка конкурентных запросов должна опираться на атомарную операцию записи и корректный маппинг ошибки unique violation в HTTP `409`.
+
+### Docker Runtime Constraints
+
+- Использовать `docker-compose` для локального запуска приложения и Postgres.
+- Персистентные тома не использовать (ни bind, ни named volumes).
+- Данные хранятся только пока контейнеры активны.
+
 ## AITM task manager
 
 Используй `aitm` для создания и отслеживания задач. MCP предпочтителен при наличии, CLI допустим.
