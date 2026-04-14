@@ -37,3 +37,9 @@ load-test-mixed:
 
 load-test-50k-hotspot:
 	npx autocannon -m POST -a 50000 -c 500 -t 20 -H 'content-type: application/json' -b '{"user_id":"load-50k","seat_id":"seat-50k-hot"}' http://localhost:3000/reserve
+
+load-test-50k-all-success:
+	npx autocannon -m POST -a 50000 -c 500 -t 20 -I -H 'content-type: application/json' -b '{"user_id":"user-[<id>]","seat_id":"seat-[<id>]"}' http://localhost:3000/reserve
+
+load-test-30s-all-success:
+	npx autocannon -m POST -d 30 -c 500 -t 20 -I -H 'content-type: application/json' -b '{"user_id":"user-[<id>]","seat_id":"seat-[<id>]"}' http://localhost:3000/reserve

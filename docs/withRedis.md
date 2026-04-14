@@ -167,6 +167,7 @@ Req/Bytes counts sampled once per second.
 ## Третий mixed-прогон: тюнинг Postgres + pool + backpressure (2026-03-19)
 
 Дополнительно к предыдущему шагу:
+
 - `DATABASE_URL`: `connection_limit=60`, `pool_timeout=20`
 - `RESERVE_MAX_IN_FLIGHT=80` (ограничение одновременных DB-операций reserve в приложении)
 
@@ -252,19 +253,21 @@ Req/Bytes counts sampled once per second.
 Профиль для всех комбинаций: `make load-test-mixed` (20s, `160 unique + 40 hotspot`).
 
 | `RESERVE_MAX_IN_FLIGHT` | `connection_limit` | Hotspot Req/Sec Avg | Hotspot p99 | Unique Req/Sec Avg | Unique p99 | Unique errors/timeouts |
-|---|---:|---:|---:|---:|---:|---:|
-| 64 | 40 | 430 | 276ms | 220 | 6042ms | 44/44 |
-| 64 | 80 | 360 | 350ms | 171 | 7905ms | 54/54 |
-| 96 | 40 | 433 | 326ms | 210 | 5865ms | 15/15 |
-| 96 | 80 | 462 | 372ms | 240 | 6124ms | 64/64 |
+| ----------------------- | -----------------: | ------------------: | ----------: | -----------------: | ---------: | ---------------------: |
+| 64                      |                 40 |                 430 |       276ms |                220 |     6042ms |                  44/44 |
+| 64                      |                 80 |                 360 |       350ms |                171 |     7905ms |                  54/54 |
+| 96                      |                 40 |                 433 |       326ms |                210 |     5865ms |                  15/15 |
+| 96                      |                 80 |                 462 |       372ms |                240 |     6124ms |                  64/64 |
 
 ### Выбранные дефолты
 
 В качестве сбалансированного значения по `p99` и timeout'ам выбран профиль:
+
 - `RESERVE_MAX_IN_FLIGHT=96`
 - `connection_limit=40`
 
 Почему не `96/80`:
+
 - даёт лучший `Unique Req/Sec`, но резко увеличивает timeout'ы (`64`) и хуже по стабильности хвоста.
 
 ## Контрольный mixed-прогон после `ON CONFLICT DO NOTHING RETURNING` (2026-03-19)
@@ -345,12 +348,14 @@ Req/Bytes counts sampled once per second.
 ## Long race validation (30s)
 
 Профиль:
+
 - `POST /reserve`
 - `120` connections
 - `30s`
 - все запросы в один `seat_id` (`race-hot-seat-long`)
 
 Результат:
+
 - `1 2xx responses, 21061 non 2xx responses`
 - `21k requests in 30.07s`
 - `Req/Sec Avg: 702.07`
@@ -358,5 +363,6 @@ Req/Bytes counts sampled once per second.
 - `p99 latency: 243 ms`
 
 Вывод:
+
 - Инвариант корректности соблюдён: успешно забронировать место удалось ровно один раз.
 - Повторно занять уже занятое место при длительной конкурентной нагрузке не удалось.
